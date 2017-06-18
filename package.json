@@ -1,0 +1,20 @@
+{
+  "name": "tesseract",
+  "version": "1.0.0",
+  "description": "A gpgpu compute library for javascript",
+  "main": "bin/index.js",
+  "scripts": {
+    "build"     : "tsc-bundle ./src/index.ts  dst/tesseract.js --removeComments --exportAs tesseract",
+    "build-test": "tsc-bundle ./test/index.ts dst/test.js --removeComments --exportAs tesseract",
+    "watch-test": "tsc-bundle ./test/index.ts dst/test.js --removeComments --watch --exportAs tesseract"
+  },
+  "keywords": [
+    "gpgpu",
+    "javascript",
+    "webgl",
+    "compute",
+    "hpc"
+  ],
+  "author": "sinclairzx81",
+  "license": "MIT"
+}
