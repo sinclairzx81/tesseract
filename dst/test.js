@@ -1796,15 +1796,18 @@ var tesseract = (function () {
       var ElementLogger = (function () {
           function ElementLogger(element) {
               this.element = element;
-              this.buffer = new Array(32);
-              for (var i = 0; i < 32; i++) {
+              this.buffer = new Array(48);
+              for (var i = 0; i < 48; i++) {
                   this.buffer[i] = "";
               }
           }
           ElementLogger.prototype.log = function (message) {
+              var _this = this;
               this.buffer.shift();
               this.buffer.push(message);
-              this.element.innerHTML = this.buffer.join("\n");
+              requestAnimationFrame(function () {
+                  _this.element.innerHTML = _this.buffer.join("\n");
+              });
           };
           return ElementLogger;
       }());
@@ -1865,14 +1868,12 @@ var tesseract = (function () {
                                   setTimeout(function () { return next(); }, 1);
                               }
                               else {
-                                  logger.log(test.name + " ok");
+                                  logger.log(test.name + " fail");
                                   context.errors().forEach(function (error) { return logger.log(" - " + error); });
-                                  setTimeout(function () { return next(); }, 1);
                               }
                           }
                           catch (e) {
                               logger.log("" + test.name + " exception " + e.message);
-                              setTimeout(function () { return next(); }, 1);
                           }
                       }
                   };
@@ -2136,6 +2137,216 @@ var tesseract = (function () {
                           test.assert(output.get(x, y, z) === z, "output[" + x + ", " + y + ", " + z + "] got: " + output.get(x, y, z) + " expect: " + z);
                       }
                   }
+              }
+              output.dispose();
+              program.dispose();
+          });
+      };
+  });
+  define("test/gpu/map-uniform", ["require", "exports"], function (require, exports) {
+      "use strict";
+      exports.__esModule = true;
+      exports.create = function (runner, context, width, height, depth) {
+          runner.describe("gpu-uniform: integer", function (test) {
+              var program = context.createProgram("\n      uniform int value;\n      [float] thread (int x) {\n        thread[0] = float(value);\n      }\n    ");
+              var expect = 122;
+              var output = context.createFloat1D(16);
+              program.execute([output], {
+                  value: expect
+              });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(expect === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + expect);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: float", function (test) {
+              var program = context.createProgram("\n      uniform float value;\n      [float] thread (int x) {\n        thread[0] = value;\n      }\n    ");
+              var expect = 122;
+              var output = context.createFloat1D(16);
+              program.execute([output], {
+                  value: expect
+              });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(expect === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + expect);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: float1D - width", function (test) {
+              var program = context.createProgram("\n      uniform Float1D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.width);\n      }\n    ");
+              var width = 12;
+              var input = context.createFloat1D(width);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(width === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: float2D - width", function (test) {
+              var program = context.createProgram("\n      uniform Float2D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.width);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var input = context.createFloat2D(width, height);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(width === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: float2D - height", function (test) {
+              var program = context.createProgram("\n      uniform Float2D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.height);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var input = context.createFloat2D(width, height);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(height === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: float3D - width", function (test) {
+              var program = context.createProgram("\n      uniform Float3D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.width);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var depth = 4;
+              var input = context.createFloat3D(width, height, depth);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(width === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: float3D - height", function (test) {
+              var program = context.createProgram("\n      uniform Float3D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.height);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var depth = 4;
+              var input = context.createFloat3D(width, height, depth);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(height === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: float3D - depth", function (test) {
+              var program = context.createProgram("\n      uniform Float3D input;\n      \n      [float] thread (int x) {\n        thread[0] = float(input.depth);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var depth = 4;
+              var input = context.createFloat3D(width, height, depth);
+              var output = context.createFloat1D(16);
+              program.execute([output], {
+                  input: input
+              });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(depth === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: color1D - width", function (test) {
+              var program = context.createProgram("\n      uniform Color1D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.width);\n      }\n    ");
+              var width = 12;
+              var input = context.createColor1D(width);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(width === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: color2D - width", function (test) {
+              var program = context.createProgram("\n      uniform Color2D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.width);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var input = context.createColor2D(width, height);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(width === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: color2D - height", function (test) {
+              var program = context.createProgram("\n      uniform Color2D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.height);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var input = context.createColor2D(width, height);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(height === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: color3D - width", function (test) {
+              var program = context.createProgram("\n      uniform Color3D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.width);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var depth = 4;
+              var input = context.createColor3D(width, height, depth);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(width === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: color3D - height", function (test) {
+              var program = context.createProgram("\n      uniform Color3D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.height);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var depth = 4;
+              var input = context.createColor3D(width, height, depth);
+              var output = context.createFloat1D(16);
+              program.execute([output], { input: input });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(height === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
+              }
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-uniform: color3D - depth", function (test) {
+              var program = context.createProgram("\n      uniform Color3D input;\n\n      [float] thread (int x) {\n        thread[0] = float(input.depth);\n      }\n    ");
+              var width = 16;
+              var height = 8;
+              var depth = 4;
+              var input = context.createColor3D(width, height, depth);
+              var output = context.createFloat1D(16);
+              program.execute([output], {
+                  input: input
+              });
+              output.pull();
+              for (var x = 0; x < output.width; x++) {
+                  test.assert(depth === output.get(x), "output[" + x + "]  got: " + output.get(x) + " expect: " + width);
               }
               output.dispose();
               program.dispose();
@@ -2598,22 +2809,23 @@ var tesseract = (function () {
           });
       };
   });
-  define("test/index", ["require", "exports", "src/index", "test/run/index", "test/cpu/getset", "test/cpu/map", "test/gpu/map-index", "test/gpu/map-one", "test/gpu/map-many", "test/gpu/copy-one", "test/gpu/copy-many"], function (require, exports, index_1, index_2, cpu_getset, cpu_map, gpu_map_index, gpu_map_one, gpu_map_many, gpu_copy_one, gpu_copy_many) {
+  define("test/index", ["require", "exports", "src/index", "test/run/index", "test/cpu/getset", "test/cpu/map", "test/gpu/map-index", "test/gpu/map-uniform", "test/gpu/map-one", "test/gpu/map-many", "test/gpu/copy-one", "test/gpu/copy-many"], function (require, exports, index_1, index_2, cpu_getset, cpu_map, gpu_map_index, gpu_map_uniform, gpu_map_one, gpu_map_many, gpu_copy_one, gpu_copy_many) {
       "use strict";
       exports.__esModule = true;
       var memory_test_single = function (runner, context, width, height, depth) {
           cpu_getset.create(runner, context, width, height, depth);
           cpu_map.create(runner, context, width, height, depth);
           gpu_map_index.create(runner, context, width, height, depth);
+          gpu_map_uniform.create(runner, context, width, height, depth);
           gpu_map_one.create(runner, context, width, height, depth);
           gpu_map_many.create(runner, context, width, height, depth);
           gpu_copy_one.create(runner, context, width, height, depth);
           gpu_copy_many.create(runner, context, width, height, depth);
       };
       var memory_test_full = function (runner, context) {
-          for (var depth = 1; depth < 16; depth++) {
-              for (var height = 1; height < 16; height++) {
-                  for (var width = 1; width < 16; width++) {
+          for (var depth = 14; depth < (16 - 1); depth++) {
+              for (var height = 14; height < (16 - 1); height++) {
+                  for (var width = 14; width < (16 - 1); width++) {
                       memory_test_single(runner, context, width, height, depth);
                   }
               }

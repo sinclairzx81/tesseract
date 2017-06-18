@@ -65,13 +65,11 @@ export class TestRunner {
               logger.log(`${test.name} ok - ${delta}ms`)
               setTimeout(() => next(), 1)
             } else {
-              logger.log(`${test.name} ok`)
+              logger.log(`${test.name} fail`)
               context.errors().forEach(error => logger.log(` - ${error}`))
-              setTimeout(() => next(), 1)
             }
           } catch (e) {
             logger.log(`${test.name}` + " exception " + e.message)
-            setTimeout(() => next(), 1)
           }
         }
       }

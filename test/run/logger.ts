@@ -40,8 +40,8 @@ export class ConsoleLogger implements Logger {
 export class ElementLogger implements Logger {
   private buffer: string[]
   constructor(private element: HTMLElement) {
-    this.buffer = new Array(32)
-    for(let i = 0; i < 32; i++) {
+    this.buffer = new Array(48)
+    for(let i = 0; i < 48; i++) {
       this.buffer[i] = ""
     }
   }
@@ -49,6 +49,8 @@ export class ElementLogger implements Logger {
   public log(message: string) {
     this.buffer.shift()
     this.buffer.push(message)
-    this.element.innerHTML = this.buffer.join("\n")
+    requestAnimationFrame(() => {
+      this.element.innerHTML = this.buffer.join("\n")
+    })
   }
 }

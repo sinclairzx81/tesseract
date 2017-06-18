@@ -32,34 +32,36 @@ import { TestRunner }       from "./run/index"
 //-----------------------------------------------------------
 // memory tests run across the GPU
 //-----------------------------------------------------------
-import * as cpu_getset    from "./cpu/getset"
-import * as cpu_map       from "./cpu/map"
-import * as gpu_map_index from "./gpu/map-index"
-import * as gpu_map_one   from "./gpu/map-one"
-import * as gpu_map_many  from "./gpu/map-many"
-import * as gpu_copy_one  from "./gpu/copy-one"
-import * as gpu_copy_many from "./gpu/copy-many"
+import * as cpu_getset       from "./cpu/getset"
+import * as cpu_map          from "./cpu/map"
+import * as gpu_map_index    from "./gpu/map-index"
+import * as gpu_map_uniform  from "./gpu/map-uniform"
+import * as gpu_map_one      from "./gpu/map-one"
+import * as gpu_map_many     from "./gpu/map-many"
+import * as gpu_copy_one     from "./gpu/copy-one"
+import * as gpu_copy_many    from "./gpu/copy-many"
 
 //-----------------------------------------------------------
 // single pass memory test for the given dimension.
 //-----------------------------------------------------------
 const memory_test_single = (runner:TestRunner, context:Context, width: number, height: number, depth: number) => {
-  cpu_getset.create    (runner, context, width, height, depth)
-  cpu_map.create       (runner, context, width, height, depth)
-  gpu_map_index.create (runner, context, width, height, depth)
-  gpu_map_one.create   (runner, context, width, height, depth)
-  gpu_map_many.create  (runner, context, width, height, depth)
-  gpu_copy_one.create  (runner, context, width, height, depth)
-  gpu_copy_many.create (runner, context, width, height, depth)
+  cpu_getset.create      (runner, context, width, height, depth)
+  cpu_map.create         (runner, context, width, height, depth)
+  gpu_map_index.create   (runner, context, width, height, depth)
+  gpu_map_uniform.create (runner, context, width, height, depth)
+  gpu_map_one.create     (runner, context, width, height, depth)
+  gpu_map_many.create    (runner, context, width, height, depth)
+  gpu_copy_one.create    (runner, context, width, height, depth)
+  gpu_copy_many.create   (runner, context, width, height, depth)
 }
 
 //-----------------------------------------------------------
 // full scan memory test.
 //-----------------------------------------------------------
 const memory_test_full = (runner:TestRunner, context:Context) => {
-  for(let depth = 1; depth < 16; depth++) {
-    for(let height = 1; height < 16; height++) {
-      for(let width = 1; width < 16; width++) {
+  for(let depth = 14; depth < (16 - 1); depth++) {
+    for(let height = 14; height < (16 - 1); height++) {
+      for(let width = 14; width < (16 - 1); width++) {
         memory_test_single(runner, context, width, height, depth)
       }
     }
