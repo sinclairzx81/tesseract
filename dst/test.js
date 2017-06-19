@@ -2835,7 +2835,58 @@ var tesseract = (function () {
           });
       };
   });
-  define("test/index", ["require", "exports", "src/index", "test/run/index", "test/cpu/getset", "test/cpu/map", "test/gpu/map-index", "test/gpu/map-uniform", "test/gpu/map-one", "test/gpu/map-many", "test/gpu/copy-one", "test/gpu/copy-many"], function (require, exports, index_1, index_2, cpu_getset, cpu_map, gpu_map_index, gpu_map_uniform, gpu_map_one, gpu_map_many, gpu_copy_one, gpu_copy_many) {
+  define("test/gpu/gpu-reduce", ["require", "exports"], function (require, exports) {
+      "use strict";
+      exports.__esModule = true;
+      exports.create = function (runner, context, width, height, depth) {
+          runner.describe("gpu-reduce: float1D->single " + width + "x" + height + "x" + depth, function (test) {
+              var program = context.createProgram("\n      uniform Float1D input;\n      [float] thread (int x) {\n        float sum = 0.0;\n        for(int i = 0; i < input.width; i++) {\n          sum += input[i];\n        }\n        thread[0] = sum;\n      }\n    ");
+              var input = context.createFloat1D(width).map(function (n) { return 1; }).push();
+              var output = context.createFloat1D(1);
+              program.execute([output], {
+                  input: input
+              });
+              output.pull();
+              test.assert(output.get(0) === width);
+              input.dispose();
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-reduce: float2D->float1D " + width + "x" + height + "x" + depth, function (test) {
+              var program = context.createProgram("\n      uniform Float2D input;\n      [float] thread (int x) {\n        float sum = 0.0;\n        for(int i = 0; i < input.height; i++) {\n          sum += input[i][x];\n        }\n        thread[0] = sum;\n      }\n    ");
+              var input = context.createFloat2D(width, height).map(function (n) { return 1; }).push();
+              var output = context.createFloat1D(width);
+              program.execute([output], {
+                  input: input
+              });
+              output.pull();
+              for (var x = 0; x < width; x++) {
+                  test.assert(output.get(x) === height);
+              }
+              input.dispose();
+              output.dispose();
+              program.dispose();
+          });
+          runner.describe("gpu-reduce: float3D->float2D " + width + "x" + height + "x" + depth, function (test) {
+              var program = context.createProgram("\n      uniform Float3D input;\n      [float] thread (int x, int y) {\n        float sum = 0.0;\n        for(int i = 0; i < input.depth; i++) {\n          sum += input[x][y][i];\n        }\n        thread[0] = sum;\n      }\n    ");
+              var input = context.createFloat3D(width, height, depth).map(function (n) { return 1; }).push();
+              var output = context.createFloat2D(width, height);
+              program.execute([output], {
+                  input: input
+              });
+              output.pull();
+              for (var y = 0; y < height; y++) {
+                  for (var x = 0; x < width; x++) {
+                      test.assert(output.get(x, y) === depth);
+                  }
+              }
+              input.dispose();
+              output.dispose();
+              program.dispose();
+          });
+      };
+  });
+  define("test/index", ["require", "exports", "src/index", "test/run/index", "test/cpu/getset", "test/cpu/map", "test/gpu/map-index", "test/gpu/map-uniform", "test/gpu/map-one", "test/gpu/map-many", "test/gpu/copy-one", "test/gpu/copy-many", "test/gpu/gpu-reduce"], function (require, exports, index_1, index_2, cpu_getset, cpu_map, gpu_map_index, gpu_map_uniform, gpu_map_one, gpu_map_many, gpu_copy_one, gpu_copy_many, gpu_reduce) {
       "use strict";
       exports.__esModule = true;
       var memory_test_single = function (runner, context, width, height, depth) {
@@ -2847,10 +2898,11 @@ var tesseract = (function () {
           gpu_map_many.create(runner, context, width, height, depth);
           gpu_copy_one.create(runner, context, width, height, depth);
           gpu_copy_many.create(runner, context, width, height, depth);
+          gpu_reduce.create(runner, context, width, height, depth);
       };
       var memory_test_full = function (runner, context) {
-          var min = 64;
-          var max = 68;
+          var min = 1;
+          var max = 4;
           for (var depth = min; depth < max; depth++) {
               for (var height = min; height < max; height++) {
                   for (var width = min; width < max; width++) {

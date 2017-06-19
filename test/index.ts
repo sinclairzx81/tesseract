@@ -42,6 +42,7 @@ import * as gpu_map_one      from "./gpu/map-one"
 import * as gpu_map_many     from "./gpu/map-many"
 import * as gpu_copy_one     from "./gpu/copy-one"
 import * as gpu_copy_many    from "./gpu/copy-many"
+import * as gpu_reduce       from "./gpu/gpu-reduce"
 
 //-----------------------------------------------------------
 //
@@ -57,6 +58,7 @@ const memory_test_single = (runner:TestRunner, context:Context, width: number, h
   gpu_map_many.create    (runner, context, width, height, depth)
   gpu_copy_one.create    (runner, context, width, height, depth)
   gpu_copy_many.create   (runner, context, width, height, depth)
+  gpu_reduce.create      (runner, context, width, height, depth)
 }
 
 //-----------------------------------------------------------
@@ -65,8 +67,8 @@ const memory_test_single = (runner:TestRunner, context:Context, width: number, h
 //
 //-----------------------------------------------------------
 const memory_test_full = (runner: TestRunner, context: Context) => {
-  const min = 64
-  const max = 68
+  const min = 1
+  const max = 4
   for(let depth = min; depth < max; depth++) {
     for(let height = min; height < max; height++) {
       for(let width = min; width < max; width++) {

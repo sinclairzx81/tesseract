@@ -619,8 +619,9 @@ var tesseract = (function () {
           }, code);
       };
       exports.replace_thread_output_dimensions = function (code) {
-          return code.replace("thread.width", "nc_thread_viewport_width")
-              .replace("thread.height", "nc_thread_viewport_height");
+          return code.replace("thread.width", "nc_thread_output_width")
+              .replace("thread.height", "nc_thread_output_height")
+              .replace("thread.depth", "nc_thread_output_depth");
       };
       exports.replace_thread_signature = function (code) {
           var results = matcher()
@@ -1714,6 +1715,7 @@ var tesseract = (function () {
       "use strict";
       exports.__esModule = true;
       exports.Context = context_1.Context;
+      exports.createContext = function (webgl2) { return new context_1.Context(webgl2); };
   });
   
   return collect(); 
