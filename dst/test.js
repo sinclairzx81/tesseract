@@ -1378,11 +1378,10 @@ var tesseract = (function () {
               this.framebuf = framebuf;
               this.plane = plane;
               this.script = script_1.transform(source);
-              this.compileScript();
-              this.cacheAttributes();
-              this.cacheUniforms();
+              this.compile();
           }
-          Program.prototype.compileScript = function () {
+          Program.prototype.compile = function () {
+              var _this = this;
               this.program = this.context.createProgram();
               this.vertexshader = this.context.createShader(this.context.VERTEX_SHADER);
               this.context.shaderSource(this.vertexshader, this.script.vertex);
@@ -1403,52 +1402,46 @@ var tesseract = (function () {
               this.context.attachShader(this.program, this.vertexshader);
               this.context.attachShader(this.program, this.fragmentshader);
               this.context.linkProgram(this.program);
-          };
-          Program.prototype.cacheAttributes = function () {
-              this.attributes = {};
-              this.attributes["nc_thread_position"] = this.context.getAttribLocation(this.program, "nc_thread_position");
-              this.attributes["nc_thread_texcoord"] = this.context.getAttribLocation(this.program, "nc_thread_texcoord");
-          };
-          Program.prototype.cacheUniforms = function () {
-              var _this = this;
-              this.uniforms = {};
-              this.uniforms["nc_thread_viewport_width"] = this.context.getUniformLocation(this.program, "nc_thread_viewport_width");
-              this.uniforms["nc_thread_viewport_height"] = this.context.getUniformLocation(this.program, "nc_thread_viewport_height");
-              this.uniforms["nc_thread_output_width"] = this.context.getUniformLocation(this.program, "nc_thread_output_width");
-              this.uniforms["nc_thread_output_height"] = this.context.getUniformLocation(this.program, "nc_thread_output_height");
-              this.uniforms["nc_thread_output_depth"] = this.context.getUniformLocation(this.program, "nc_thread_output_depth");
-              this.script.uniforms.forEach(function (uniform) {
-                  switch (uniform.type) {
+              this.cache = { attributes: {}, uniforms: {} };
+              this.cache.attributes["nc_thread_position"] = this.context.getAttribLocation(this.program, "nc_thread_position");
+              this.cache.attributes["nc_thread_texcoord"] = this.context.getAttribLocation(this.program, "nc_thread_texcoord");
+              this.cache.uniforms["nc_thread_viewport_width"] = this.context.getUniformLocation(this.program, "nc_thread_viewport_width");
+              this.cache.uniforms["nc_thread_viewport_height"] = this.context.getUniformLocation(this.program, "nc_thread_viewport_height");
+              this.cache.uniforms["nc_thread_output_width"] = this.context.getUniformLocation(this.program, "nc_thread_output_width");
+              this.cache.uniforms["nc_thread_output_height"] = this.context.getUniformLocation(this.program, "nc_thread_output_height");
+              this.cache.uniforms["nc_thread_output_depth"] = this.context.getUniformLocation(this.program, "nc_thread_output_depth");
+              this.script.uniforms.forEach(function (script_uniform) {
+                  switch (script_uniform.type) {
                       case "int":
                       case "float": {
-                          _this.uniforms[uniform.name] = _this.context.getUniformLocation(_this.program, uniform.name);
+                          _this.cache.uniforms[script_uniform.name] = _this.context.getUniformLocation(_this.program, script_uniform.name);
                           break;
                       }
                       case "Color1D":
                       case "Float1D": {
-                          _this.uniforms["nc_uniform_" + uniform.name + "_texture"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_texture");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_textureWidth"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureWidth");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_textureHeight"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureHeight");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_width"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_width");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_texture");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_textureWidth");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_textureHeight");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_width");
                           break;
                       }
                       case "Color2D":
                       case "Float2D": {
-                          _this.uniforms["nc_uniform_" + uniform.name + "_texture"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_texture");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_textureWidth"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureWidth");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_textureHeight"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureHeight");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_width"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_width");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_height"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_height");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_texture");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_textureWidth");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_textureHeight");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_width");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_height"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_height");
                           break;
                       }
                       case "Color3D":
                       case "Float3D": {
-                          _this.uniforms["nc_uniform_" + uniform.name + "_texture"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_texture");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_textureWidth"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureWidth");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_textureHeight"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureHeight");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_width"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_width");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_height"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_height");
-                          _this.uniforms["nc_uniform_" + uniform.name + "_depth"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_depth");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_texture");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_textureWidth");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_textureHeight");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_width");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_height"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_height");
+                          _this.cache.uniforms["nc_uniform_" + script_uniform.name + "_depth"] = _this.context.getUniformLocation(_this.program, "nc_uniform_" + script_uniform.name + "_depth");
                           break;
                       }
                   }
@@ -1456,183 +1449,205 @@ var tesseract = (function () {
           };
           Program.prototype.execute = function (outputs, uniforms) {
               var _this = this;
-              if (!this.validate(outputs))
-                  return;
+              var typecheck = this.typecheck(outputs, uniforms);
+              if (!typecheck.success) {
+                  console.warn(typecheck.errors.join("\n"));
+                  throw Error("unable to execute.");
+              }
               this.context.bindFramebuffer(this.context.FRAMEBUFFER, this.framebuf);
-              for (var i = 0; i < outputs.length; i++) {
-                  this.context.framebufferTexture2D(this.context.FRAMEBUFFER, this.context.COLOR_ATTACHMENT0 + i, this.context.TEXTURE_2D, outputs[i].texture, 0);
-                  if (!(this.context.checkFramebufferStatus(this.context.FRAMEBUFFER) === this.context.FRAMEBUFFER_COMPLETE)) {
-                      console.warn("unable to attach output[" + i + "] as render target.");
+              this.context.drawBuffers(outputs.map(function (output, index) { return _this.context.COLOR_ATTACHMENT0 + index; }));
+              outputs.forEach(function (output, index) {
+                  _this.context.framebufferTexture2D(_this.context.FRAMEBUFFER, _this.context.COLOR_ATTACHMENT0 + index, _this.context.TEXTURE_2D, output.texture, 0);
+                  if (!(_this.context.checkFramebufferStatus(_this.context.FRAMEBUFFER) === _this.context.FRAMEBUFFER_COMPLETE)) {
+                      console.warn("unable to attach output[" + index + "] as render target.");
                       return;
                   }
-              }
-              this.context.drawBuffers(outputs.map(function (output, index) { return _this.context.COLOR_ATTACHMENT0 + index; }));
+              });
+              this.context.useProgram(this.program);
               var output = outputs[0];
               switch (output.type) {
                   case "Float1D":
                   case "Color1D":
-                      this.render({
-                          type: "1D",
-                          viewport: { width: output.textureWidth, height: output.textureHeight },
-                          output: { width: output.width }
-                      }, uniforms);
+                      this.context.viewport(0, 0, output.textureWidth, output.textureHeight);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_viewport_width"], output.textureWidth);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_viewport_height"], output.textureHeight);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_output_width"], output.width);
                       break;
                   case "Float2D":
                   case "Color2D":
-                      this.render({
-                          type: "2D",
-                          viewport: { width: output.textureWidth, height: output.textureHeight },
-                          output: { width: output.width, height: output.height }
-                      }, uniforms);
+                      this.context.viewport(0, 0, output.textureWidth, output.textureHeight);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_viewport_width"], output.textureWidth);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_viewport_height"], output.textureHeight);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_output_width"], output.width);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_output_height"], output.height);
                       break;
                   case "Float3D":
                   case "Color3D":
-                      this.render({
-                          type: "3D",
-                          viewport: { width: output.textureWidth, height: output.textureHeight },
-                          output: { width: output.width, height: output.height, depth: output.depth }
-                      }, uniforms);
-                      break;
-              }
-              for (var i = 0; i < outputs.length; i++) {
-                  this.context.framebufferTexture2D(this.context.FRAMEBUFFER, this.context.COLOR_ATTACHMENT0 + i, this.context.TEXTURE_2D, null, 0);
-              }
-              ;
-              this.context.bindFramebuffer(this.context.FRAMEBUFFER, null);
-          };
-          Program.prototype.render = function (render, uniforms) {
-              var _this = this;
-              this.context.useProgram(this.program);
-              switch (render.type) {
-                  case "1D":
-                      this.context.viewport(0, 0, render.viewport.width, render.viewport.height);
-                      this.context.uniform1i(this.uniforms["nc_thread_viewport_width"], render.viewport.width);
-                      this.context.uniform1i(this.uniforms["nc_thread_viewport_height"], render.viewport.height);
-                      this.context.uniform1i(this.uniforms["nc_thread_output_width"], render.output.width);
-                      break;
-                  case "2D":
-                      this.context.viewport(0, 0, render.viewport.width, render.viewport.height);
-                      this.context.uniform1i(this.uniforms["nc_thread_viewport_width"], render.viewport.width);
-                      this.context.uniform1i(this.uniforms["nc_thread_viewport_height"], render.viewport.height);
-                      this.context.uniform1i(this.uniforms["nc_thread_output_width"], render.output.width);
-                      this.context.uniform1i(this.uniforms["nc_thread_output_height"], render.output.height);
-                      break;
-                  case "3D":
-                      this.context.viewport(0, 0, render.viewport.width, render.viewport.height);
-                      this.context.uniform1i(this.uniforms["nc_thread_viewport_width"], render.viewport.width);
-                      this.context.uniform1i(this.uniforms["nc_thread_viewport_height"], render.viewport.height);
-                      this.context.uniform1i(this.uniforms["nc_thread_output_width"], render.output.width);
-                      this.context.uniform1i(this.uniforms["nc_thread_output_height"], render.output.height);
-                      this.context.uniform1i(this.uniforms["nc_thread_output_depth"], render.output.depth);
+                      this.context.viewport(0, 0, output.textureWidth, output.textureHeight);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_viewport_width"], output.textureWidth);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_viewport_height"], output.textureHeight);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_output_width"], output.width);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_output_height"], output.height);
+                      this.context.uniform1i(this.cache.uniforms["nc_thread_output_depth"], output.depth);
                       break;
               }
               var texture_index = 0;
-              this.script.uniforms.forEach(function (uniform) {
-                  if (uniforms[uniform.name] === undefined)
+              this.script.uniforms.forEach(function (script_uniform) {
+                  if (uniforms[script_uniform.name] === undefined)
                       return;
-                  switch (uniform.type) {
+                  switch (script_uniform.type) {
                       case "float": {
-                          var location_1 = _this.context.getUniformLocation(_this.program, uniform.name);
-                          _this.context.uniform1f(location_1, uniforms[uniform.name]);
+                          _this.context.uniform1f(_this.cache.uniforms[script_uniform.name], uniforms[script_uniform.name]);
                           break;
                       }
                       case "int": {
-                          var location_2 = _this.context.getUniformLocation(_this.program, uniform.name);
-                          _this.context.uniform1i(location_2, uniforms[uniform.name]);
+                          _this.context.uniform1i(_this.cache.uniforms[script_uniform.name], uniforms[script_uniform.name]);
                           break;
                       }
                       case "Color1D":
                       case "Float1D": {
-                          var data = uniforms[uniform.name];
-                          var texture = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_texture");
-                          var textureWidth = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureWidth");
-                          var textureHeight = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureHeight");
-                          var width = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_width");
-                          _this.context.activeTexture(_this.context.TEXTURE0 + texture_index);
-                          _this.context.bindTexture(_this.context.TEXTURE_2D, data.texture);
-                          _this.context.uniform1i(texture, texture_index);
-                          texture_index += 1;
-                          _this.context.uniform1i(textureWidth, data.textureWidth);
-                          _this.context.uniform1i(textureHeight, data.textureHeight);
-                          _this.context.uniform1i(width, data.width);
+                          var data = uniforms[script_uniform.name];
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"], data.textureWidth);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"], data.textureHeight);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"], data.width);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"], data.texture);
+                              _this.context.activeTexture(_this.context.TEXTURE0 + texture_index);
+                              _this.context.bindTexture(_this.context.TEXTURE_2D, data.texture);
+                              texture_index += 1;
+                          }
                           break;
                       }
                       case "Color2D":
                       case "Float2D": {
-                          var data = uniforms[uniform.name];
-                          var texture = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_texture");
-                          var textureWidth = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureWidth");
-                          var textureHeight = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureHeight");
-                          var width = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_width");
-                          var height = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_height");
-                          _this.context.activeTexture(_this.context.TEXTURE0 + texture_index);
-                          _this.context.bindTexture(_this.context.TEXTURE_2D, data.texture);
-                          _this.context.uniform1i(texture, texture_index);
-                          texture_index += 1;
-                          _this.context.uniform1i(textureWidth, data.textureWidth);
-                          _this.context.uniform1i(textureHeight, data.textureHeight);
-                          _this.context.uniform1i(width, data.width);
-                          _this.context.uniform1i(height, data.height);
+                          var data = uniforms[script_uniform.name];
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"], data.textureWidth);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"], data.textureHeight);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"], data.width);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_height"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_height"], data.height);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"], data.texture);
+                              _this.context.activeTexture(_this.context.TEXTURE0 + texture_index);
+                              _this.context.bindTexture(_this.context.TEXTURE_2D, data.texture);
+                              texture_index += 1;
+                          }
                           break;
                       }
                       case "Color3D":
                       case "Float3D": {
-                          var data = uniforms[uniform.name];
-                          var texture = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_texture");
-                          var textureWidth = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureWidth");
-                          var textureHeight = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_textureHeight");
-                          var width = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_width");
-                          var height = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_height");
-                          var depth = _this.context.getUniformLocation(_this.program, "nc_uniform_" + uniform.name + "_depth");
-                          _this.context.activeTexture(_this.context.TEXTURE0 + texture_index);
-                          _this.context.bindTexture(_this.context.TEXTURE_2D, data.texture);
-                          _this.context.uniform1i(texture, texture_index);
-                          texture_index += 1;
-                          _this.context.uniform1i(textureWidth, data.textureWidth);
-                          _this.context.uniform1i(textureHeight, data.textureHeight);
-                          _this.context.uniform1i(width, data.width);
-                          _this.context.uniform1i(height, data.height);
-                          _this.context.uniform1i(depth, data.depth);
+                          var data = uniforms[script_uniform.name];
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureWidth"], data.textureWidth);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_textureHeight"], data.textureHeight);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_width"], data.width);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_height"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_height"], data.height);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_depth"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_depth"], data.depth);
+                          }
+                          if (_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"]) {
+                              _this.context.uniform1i(_this.cache.uniforms["nc_uniform_" + script_uniform.name + "_texture"], data.texture);
+                              _this.context.activeTexture(_this.context.TEXTURE0 + texture_index);
+                              _this.context.bindTexture(_this.context.TEXTURE_2D, data.texture);
+                              texture_index += 1;
+                          }
                           break;
                       }
                   }
               });
               this.context.bindBuffer(this.context.ARRAY_BUFFER, this.plane.position);
-              this.context.enableVertexAttribArray(this.attributes["nc_thread_position"]);
-              this.context.vertexAttribPointer(this.attributes["nc_thread_position"], 3, this.context.FLOAT, false, 0, 0);
-              if (this.attributes["nc_thread_texcoord"] !== -1) {
+              this.context.enableVertexAttribArray(this.cache.attributes["nc_thread_position"]);
+              this.context.vertexAttribPointer(this.cache.attributes["nc_thread_position"], 3, this.context.FLOAT, false, 0, 0);
+              if (this.cache.attributes["nc_thread_texcoord"] !== -1) {
                   this.context.bindBuffer(this.context.ARRAY_BUFFER, this.plane.texcoord);
-                  this.context.enableVertexAttribArray(this.attributes["nc_thread_texcoord"]);
-                  this.context.vertexAttribPointer(this.attributes["nc_thread_texcoord"], 2, this.context.FLOAT, false, 0, 0);
+                  this.context.enableVertexAttribArray(this.cache.attributes["nc_thread_texcoord"]);
+                  this.context.vertexAttribPointer(this.cache.attributes["nc_thread_texcoord"], 2, this.context.FLOAT, false, 0, 0);
               }
               this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, this.plane.indices);
               this.context.drawElements(this.context.TRIANGLES, 6, this.context.UNSIGNED_SHORT, 0);
+              outputs.forEach(function (_, index) {
+                  _this.context.framebufferTexture2D(_this.context.FRAMEBUFFER, _this.context.COLOR_ATTACHMENT0 + index, _this.context.TEXTURE_2D, null, 0);
+              });
+              this.context.bindFramebuffer(this.context.FRAMEBUFFER, null);
           };
-          Program.prototype.validate = function (outputs) {
+          Program.prototype.typecheck = function (outputs, uniforms) {
+              var _this = this;
+              var errors = [];
               if (this.script.thread.outputs.length !== outputs.length) {
-                  console.warn("program.execute(): expected " + this.script.thread.outputs.length + " outputs, " + outputs.length + " given.");
-                  return false;
+                  errors.push("typecheck: expected " + this.script.thread.outputs.length + " outputs, " + outputs.length + " given.");
               }
-              for (var i = 0; i < outputs.length; i++) {
-                  if (outputs[i].type.indexOf(this.script.thread.indexing) === -1) {
-                      console.warn("program.execute(): a " + outputs[i].type + " is an invalid output for " + this.script.thread.indexing + " indexed thread functions.");
-                      return false;
+              outputs.forEach(function (output, index) {
+                  if (output.type.indexOf(_this.script.thread.indexing) === -1) {
+                      errors.push("typecheck: a " + outputs[index].type + " is an invalid output for " + _this.script.thread.indexing + " indexed thread functions.");
                   }
+              });
+              if (!outputs.every(function (output) { return outputs[0].textureWidth === output.textureWidth && outputs[0].textureHeight === output.textureHeight; })) {
+                  errors.push("typecheck: all output dimensions must be the same for all outputs.");
               }
-              for (var i = 1; i < outputs.length; i++) {
-                  if (outputs[0].textureWidth !== outputs[i].textureWidth ||
-                      outputs[0].textureHeight !== outputs[i].textureHeight) {
-                      console.warn("program.execute(): all output dimensions must be the same for all outputs.");
-                      for (var j = 0; j < outputs.length; j++) {
-                          var output = outputs[j];
-                          console.warn("program.execute(): - [" + j + "] - " + output.type + " -> " + output.textureWidth + "x" + output.textureHeight);
-                      }
-                      return false;
+              this.script.uniforms.forEach(function (script_uniform) {
+                  if (uniforms[script_uniform.name] === undefined)
+                      return;
+                  var uniform = uniforms[script_uniform.name];
+                  switch (script_uniform.type) {
+                      case "int":
+                      case "float":
+                          if (typeof uniform !== "number")
+                              errors.push("typecheck: " + script_uniform.name + " is invalid. Expected " + script_uniform.type + ".");
+                          break;
+                      case "Float1D":
+                          if (uniform.type !== "Float1D")
+                              errors.push("typecheck: uniform " + script_uniform.name + " is invalid. Expected " + script_uniform.type + ", got " + uniform.type + ".");
+                          break;
+                      case "Color1D":
+                          if (uniform.type !== "Color1D")
+                              errors.push("typecheck: uniform " + script_uniform.name + " is invalid. Expected " + script_uniform.type + ", got " + uniform.type + ".");
+                          break;
+                      case "Float2D":
+                          if (uniform.type !== "Float2D")
+                              errors.push("typecheck: uniform " + script_uniform.name + " is invalid. Expected " + script_uniform.type + ", got " + uniform.type + ".");
+                          break;
+                      case "Color2D":
+                          if (uniform.type !== "Color2D")
+                              errors.push("typecheck: uniform " + script_uniform.name + " is invalid. Expected " + script_uniform.type + ", got " + uniform.type + ".");
+                          break;
+                      case "Float3D":
+                          if (uniform.type !== "Float3D")
+                              errors.push("typecheck: uniform " + script_uniform.name + " is invalid. Expected " + script_uniform.type + ", got " + uniform.type + ".");
+                          break;
+                      case "Color3D":
+                          if (uniform.type !== "Color3D")
+                              errors.push("typecheck: uniform " + script_uniform.name + " is invalid. Expected " + script_uniform.type + ", got " + uniform.type + ".");
+                          break;
                   }
-              }
-              return true;
+              });
+              return {
+                  success: errors.length === 0,
+                  errors: errors
+              };
           };
           Program.prototype.dispose = function () {
+              this.context.deleteShader(this.vertexshader);
+              this.context.deleteShader(this.fragmentshader);
               this.context.deleteProgram(this.program);
           };
           return Program;
@@ -2823,9 +2838,9 @@ var tesseract = (function () {
           gpu_copy_many.create(runner, context, width, height, depth);
       };
       var memory_test_full = function (runner, context) {
-          for (var depth = 14; depth < (16 - 1); depth++) {
-              for (var height = 14; height < (16 - 1); height++) {
-                  for (var width = 14; width < (16 - 1); width++) {
+          for (var depth = 12; depth < (16 - 1); depth++) {
+              for (var height = 12; height < (16 - 1); height++) {
+                  for (var width = 12; width < (16 - 1); width++) {
                       memory_test_single(runner, context, width, height, depth);
                   }
               }
