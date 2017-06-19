@@ -1322,6 +1322,12 @@ var tesseract = (function () {
           "}"
       ].join("\n"); };
       exports.transform = function (code) {
+          code = code.split("\n").map(function (line) {
+              var index = line.indexOf("//");
+              return (index !== -1)
+                  ? line.slice(0, index)
+                  : line;
+          }).join("\n");
           var thread = exports.read_program_thread_function(code);
           var uniforms = exports.read_program_uniforms(code);
           code = exports.replace_float1D_indexer(code);

@@ -987,6 +987,16 @@ export interface Script {
 
 export const transform = (code: string): any => {
   //-------------------------------------------
+  // remove comments
+  //-------------------------------------------
+  code = code.split("\n").map(line => {
+    const index = line.indexOf("//")
+    return (index !== -1)
+      ? line.slice(0, index)
+      : line
+  }).join("\n")
+  
+  //-------------------------------------------
   // inspect
   //-------------------------------------------
   const thread   = read_program_thread_function (code)
