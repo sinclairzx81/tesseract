@@ -67,8 +67,8 @@ const memory_test_single = (runner:TestRunner, context:Context, width: number, h
 //
 //-----------------------------------------------------------
 const memory_test_full = (runner: TestRunner, context: Context) => {
-  const min = 1
-  const max = 4
+  const min = 8
+  const max = 12
   for(let depth = min; depth < max; depth++) {
     for(let height = min; height < max; height++) {
       for(let width = min; width < max; width++) {

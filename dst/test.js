@@ -2901,8 +2901,8 @@ var tesseract = (function () {
           gpu_reduce.create(runner, context, width, height, depth);
       };
       var memory_test_full = function (runner, context) {
-          var min = 1;
-          var max = 4;
+          var min = 8;
+          var max = 12;
           for (var depth = min; depth < max; depth++) {
               for (var height = min; height < max; height++) {
                   for (var width = min; width < max; width++) {
