@@ -262,7 +262,7 @@ export class Program {
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_textureHeight`]) { this.context.uniform1i  (this.cache.uniforms[`nc_uniform_${script_uniform.name}_textureHeight`], data.textureHeight) }
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_width`])         { this.context.uniform1i  (this.cache.uniforms[`nc_uniform_${script_uniform.name}_width`],         data.width) }
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`]) {
-            this.context.uniform1i     (this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`], data.texture as number)
+            this.context.uniform1i     (this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`], texture_index)
             this.context.activeTexture (this.context.TEXTURE0 + texture_index)
             this.context.bindTexture   (this.context.TEXTURE_2D, data.texture)
             texture_index += 1
@@ -277,7 +277,7 @@ export class Program {
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_width`])         { this.context.uniform1i  (this.cache.uniforms[`nc_uniform_${script_uniform.name}_width`],         data.width) }
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_height`])        { this.context.uniform1i  (this.cache.uniforms[`nc_uniform_${script_uniform.name}_height`],        data.height) }
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`]) {
-            this.context.uniform1i    (this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`], data.texture as number)
+            this.context.uniform1i    (this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`], texture_index)
             this.context.activeTexture(this.context.TEXTURE0 + texture_index)
             this.context.bindTexture  (this.context.TEXTURE_2D, data.texture)
             texture_index += 1
@@ -294,7 +294,7 @@ export class Program {
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_height`])        { this.context.uniform1i  (this.cache.uniforms[`nc_uniform_${script_uniform.name}_height`],        data.height) }
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_depth`])         { this.context.uniform1i  (this.cache.uniforms[`nc_uniform_${script_uniform.name}_depth`],         data.depth) }
           if(this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`]) {
-            this.context.uniform1i    (this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`], data.texture as number)
+            this.context.uniform1i    (this.cache.uniforms[`nc_uniform_${script_uniform.name}_texture`], texture_index)
             this.context.activeTexture(this.context.TEXTURE0 + texture_index)
             this.context.bindTexture  (this.context.TEXTURE_2D, data.texture)
             texture_index += 1

@@ -140,7 +140,7 @@ export const create = (runner: TestRunner, context: Context, width: number, heig
       Math.floor(Math.random() * 256), 
       Math.floor(Math.random() * 256)
     ]).push()
-
+    
     const output0 = context.createColor1D (width)
     const output1 = context.createColor1D (width)
     program.execute([output0, output1], { input })

@@ -28,8 +28,19 @@ THE SOFTWARE.
 
 /// <reference path="./typings/webgl2.d.ts" />
 
-import { Context } from "./context"
+import { Context }                   from "./context"
+import { Program }                   from "./program"
+import { Script, transform }         from "./script"
+import { Float1D, Float2D, Float3D } from "./float"
+import { Color1D, Color2D, Color3D } from "./color"
+
 
 export const createContext = (webgl2?: WebGL2RenderingContext) => new Context(webgl2)
 
-export { Context }
+export { 
+  Context,
+  Program,
+  Script, transform,
+  Float1D, Float2D, Float3D,
+  Color1D, Color2D, Color3D,
+}
