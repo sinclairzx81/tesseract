@@ -67,7 +67,7 @@ export class Float1D implements Disposable {
     this.type          = "Float1D"
     this.context       = context
     this.framebuf      = framebuf
-    this.width        = length
+    this.width         = length
     this.textureWidth  = width
     this.textureHeight = height
     this.textureData   = new Uint8Array(width * height * 4)

@@ -30,7 +30,9 @@ import { Context }          from "../src/index"
 import { TestRunner }       from "./run/index"
 
 //-----------------------------------------------------------
+//
 // memory tests run across the GPU
+//
 //-----------------------------------------------------------
 import * as cpu_getset       from "./cpu/getset"
 import * as cpu_map          from "./cpu/map"
@@ -42,7 +44,9 @@ import * as gpu_copy_one     from "./gpu/copy-one"
 import * as gpu_copy_many    from "./gpu/copy-many"
 
 //-----------------------------------------------------------
+//
 // single pass memory test for the given dimension.
+//
 //-----------------------------------------------------------
 const memory_test_single = (runner:TestRunner, context:Context, width: number, height: number, depth: number) => {
   cpu_getset.create      (runner, context, width, height, depth)
@@ -56,12 +60,16 @@ const memory_test_single = (runner:TestRunner, context:Context, width: number, h
 }
 
 //-----------------------------------------------------------
+//
 // full scan memory test.
+//
 //-----------------------------------------------------------
 const memory_test_full = (runner: TestRunner, context: Context) => {
-  for(let depth = 12; depth < (16 - 1); depth++) {
-    for(let height = 12; height < (16 - 1); height++) {
-      for(let width = 12; width < (16 - 1); width++) {
+  const min = 64
+  const max = 68
+  for(let depth = min; depth < max; depth++) {
+    for(let height = min; height < max; height++) {
+      for(let width = min; width < max; width++) {
         memory_test_single(runner, context, width, height, depth)
       }
     }
@@ -74,45 +82,4 @@ memory_test_full(runner, context)
 runner.run()
 
 
-// const program = context.createProgram(`
-//   uniform int     value_int;
-//   uniform float   value_float;
-//   uniform Float1D value_float1D;
-//   uniform Float2D value_float2D;
-//   uniform Float3D value_float3D;
-//   uniform Color1D value_color1D;
-//   uniform Color2D value_color2D;
-//   uniform Color3D value_color3D;
-  
-//   [float] thread(int x) {
-//     thread[0] = value_float2D[x][0];
-//   }
-// `)
-
-// console.log(JSON.stringify(program.script.uniforms, null, 2))
-// const output = context.createFloat1D(2)
-
-// const value_int      = 1
-// const value_float    = 1
-// const value_float1D  = context.createFloat1D(1).map(x => 56).push()
-// const value_float2D  = context.createFloat2D(1, 1).map(x => 42).push()
-// const value_float3D  = context.createFloat3D(1, 1, 1).map(x => 11).push()
-// const value_color1D  = context.createColor1D(1).map(x => [0, 0, 0, 0]).push()
-// const value_color2D  = context.createColor2D(1, 1).map(x => [0, 0, 0, 0]).push()
-// const value_color3D  = context.createColor3D(1, 1, 1).map(x => [0, 0, 0, 0]).push()
-
-// console.log(program.cache)
-
-// program.execute([output], {
-//   value_int,
-//   value_float,
-//   value_float1D,
-//   value_float2D,
-//   value_float3D,
-//   value_color1D,
-//   value_color2D,
-//   value_color3D
-// })
-
-// console.log(output.pull().data)
 

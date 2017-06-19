@@ -619,8 +619,9 @@ var tesseract = (function () {
           }, code);
       };
       exports.replace_thread_output_dimensions = function (code) {
-          return code.replace("thread.width", "nc_thread_viewport_width")
-              .replace("thread.height", "nc_thread_viewport_height");
+          return code.replace("thread.width", "nc_thread_output_width")
+              .replace("thread.height", "nc_thread_output_height")
+              .replace("thread.depth", "nc_thread_output_depth");
       };
       exports.replace_thread_signature = function (code) {
           var results = matcher()
@@ -1330,6 +1331,9 @@ var tesseract = (function () {
           }).join("\n");
           var thread = exports.read_program_thread_function(code);
           var uniforms = exports.read_program_uniforms(code);
+          if (thread.indexing === "error") {
+              throw Error("program is invalid.");
+          }
           code = exports.replace_float1D_indexer(code);
           code = exports.replace_float1D_width(code);
           code = exports.replace_float1D_uniform(code);
@@ -1711,6 +1715,7 @@ var tesseract = (function () {
       "use strict";
       exports.__esModule = true;
       exports.Context = context_1.Context;
+      exports.createContext = function (webgl2) { return new context_1.Context(webgl2); };
   });
   define("test/run/reflect", ["require", "exports"], function (require, exports) {
       "use strict";
@@ -2844,9 +2849,11 @@ var tesseract = (function () {
           gpu_copy_many.create(runner, context, width, height, depth);
       };
       var memory_test_full = function (runner, context) {
-          for (var depth = 12; depth < (16 - 1); depth++) {
-              for (var height = 12; height < (16 - 1); height++) {
-                  for (var width = 12; width < (16 - 1); width++) {
+          var min = 64;
+          var max = 68;
+          for (var depth = min; depth < max; depth++) {
+              for (var height = min; height < max; height++) {
+                  for (var width = min; width < max; width++) {
                       memory_test_single(runner, context, width, height, depth);
                   }
               }

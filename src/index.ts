@@ -30,6 +30,6 @@ THE SOFTWARE.
 
 import { Context } from "./context"
 
-export {
-  Context
-}
+export const createContext = (webgl2?: WebGL2RenderingContext) => new Context(webgl2)
+
+export { Context }

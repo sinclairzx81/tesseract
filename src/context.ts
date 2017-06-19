@@ -26,8 +26,6 @@ THE SOFTWARE.
 
 ---------------------------------------------------------------------------*/
 
-/// <reference path="./typings/webgl2.d.ts" />
-
 import { Disposable }                from "./dispose"
 import { Color1D, Color2D, Color3D } from "./color"
 import { Float1D, Float2D, Float3D } from "./float"

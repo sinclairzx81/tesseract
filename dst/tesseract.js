@@ -1330,6 +1330,9 @@ var tesseract = (function () {
           }).join("\n");
           var thread = exports.read_program_thread_function(code);
           var uniforms = exports.read_program_uniforms(code);
+          if (thread.indexing === "error") {
+              throw Error("program is invalid.");
+          }
           code = exports.replace_float1D_indexer(code);
           code = exports.replace_float1D_width(code);
           code = exports.replace_float1D_uniform(code);

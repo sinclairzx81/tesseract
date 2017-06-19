@@ -199,8 +199,9 @@ export const replace_thread_output_indexer = (code: string) => {
   }, code)  
 }
 export const replace_thread_output_dimensions = (code: string) => {
-  return code.replace("thread.width",  "nc_thread_viewport_width")
-             .replace("thread.height", "nc_thread_viewport_height")
+  return code.replace("thread.width",  "nc_thread_output_width")
+             .replace("thread.height", "nc_thread_output_height")
+             .replace("thread.depth",  "nc_thread_output_depth")
 }
 export const replace_thread_signature = (code: string) => {
   const results = 
@@ -1001,6 +1002,9 @@ export const transform = (code: string): any => {
   //-------------------------------------------
   const thread   = read_program_thread_function (code)
   const uniforms = read_program_uniforms        (code)
+  if(thread.indexing === "error") {
+    throw Error(`program is invalid.`)
+  }
 
   //-------------------------------------------
   // floats

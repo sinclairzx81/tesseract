@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 import { Disposable } from "./dispose"
 
-
 type ColorData = [number, number, number, number] | Array<number>
 
 /**

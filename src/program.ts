@@ -400,7 +400,7 @@ export class Program {
       errors : errors
     }
   }
-  
+
   /**
    * disposes of this program.
    * @returns {void}

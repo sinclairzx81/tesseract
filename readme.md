@@ -3,7 +3,7 @@
 A webgl 2.0 gpgpu compute library for JavaScript.
 
 ```typescript
-const context = new tesseract.Context()
+const context = tesseract.createContext()
 
 const program = context.createProgram(`
   [float] thread (int x) {
