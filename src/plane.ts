@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 //---------------------------------------------------------------------
 //
-// neuron-compute plane.
+// tesseract-compute plane.
 //  
 // A full screen quad rendered across the output viewport. The coordinates
 // for the quad pass through the vertex shader without transformation, however

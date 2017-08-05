@@ -43,14 +43,12 @@ type UniformType =
 | BufferType 
 | number
 
-export interface ProgramUniforms {
-  [name: string]: UniformType
-}
+export type ProgramUniforms = { [name: string]: UniformType | number | number[] }
 
 /**
  * Program
  * 
- * Tesseract compute program.
+ * Tesseract compute program. Accepts buffers and uniforms and computes output buffers.
  */
 export class Program {
   private program       : WebGLProgram
@@ -83,9 +81,7 @@ export class Program {
   private compile() : void {
 
     //---------------------------------------------------
-    //
     // PROGRAM: COMPILE AND LINK
-    //
     //---------------------------------------------------
     this.program      = this.context.createProgram()
     this.vertexshader = this.context.createShader(this.context.VERTEX_SHADER)
@@ -109,9 +105,7 @@ export class Program {
     this.context.linkProgram  (this.program)
 
     //---------------------------------------------------
-    //
     // PROGRAM: CACHE ATTRIBUTES AND UNIFORMS
-    //
     //---------------------------------------------------
     this.cache = { attributes: {}, uniforms: {} }
     this.cache.attributes["nc_thread_position"]      = this.context.getAttribLocation (this.program, "nc_thread_position")  
@@ -123,8 +117,16 @@ export class Program {
     this.cache.uniforms["nc_thread_output_depth"]    = this.context.getUniformLocation(this.program, "nc_thread_output_depth")
     this.script.uniforms.forEach(script_uniform => {
       switch(script_uniform.type) {
+        case "float":
+        case "vec2":
+        case "vec3":
+        case "vec4": 
         case "int":
-        case "float": {
+        case "ivec2":
+        case "ivec3":
+        case "ivec4": 
+        case "mat3":
+        case "mat4": {
           this.cache.uniforms[script_uniform.name] = this.context.getUniformLocation(this.program, script_uniform.name)
           break;
         }
@@ -168,9 +170,7 @@ export class Program {
   public execute(outputs: Array<BufferType>, uniforms: ProgramUniforms): void {
 
     //---------------------------------------------------
-    //
     // TYPECHECK: INPUT / OUTPUT
-    //
     //---------------------------------------------------
     const typecheck = this.typecheck(outputs, uniforms)
     if(!typecheck.success) {
@@ -179,9 +179,7 @@ export class Program {
     }
 
     //---------------------------------------------------
-    //
     // FRAMEBUFFER: BEGIN
-    //
     //---------------------------------------------------
     this.context.bindFramebuffer(this.context.FRAMEBUFFER, this.framebuf)
     this.context.drawBuffers    (outputs.map((output, index) => this.context.COLOR_ATTACHMENT0 + index))
@@ -199,16 +197,12 @@ export class Program {
     })
     
     //---------------------------------------------------
-    //
     // PROGRAM: BEGIN
-    //
     //---------------------------------------------------
     this.context.useProgram (this.program)
 
     //---------------------------------------------------
-    //
     // PROGRAM: THREAD UNIFORMS
-    //
     //---------------------------------------------------
     const output = outputs[0]
     switch(output.type) {
@@ -239,9 +233,7 @@ export class Program {
     }
 
     //---------------------------------------------------
-    //
     // PROGRAM: USER UNIFORMS
-    //
     //---------------------------------------------------
     let texture_index = 0
     this.script.uniforms.forEach(script_uniform => {
@@ -251,8 +243,48 @@ export class Program {
           this.context.uniform1f(this.cache.uniforms[script_uniform.name], uniforms[script_uniform.name] as number);
           break;
         }
+        case "vec2": {
+          const v = uniforms[script_uniform.name] as number[]
+          this.context.uniform2f(this.cache.uniforms[script_uniform.name], v[0], v[1]);
+          break;
+        }
+        case "vec3": {
+          const v = uniforms[script_uniform.name] as number[]
+          this.context.uniform3f(this.cache.uniforms[script_uniform.name], v[0], v[1], v[2]);
+          break;
+        }
+        case "vec4": {
+          const v = uniforms[script_uniform.name] as number[]
+          this.context.uniform4f(this.cache.uniforms[script_uniform.name], v[0], v[1], v[2], v[3]);
+          break;
+        }
         case "int": {
           this.context.uniform1i(this.cache.uniforms[script_uniform.name], uniforms[script_uniform.name] as number);
+          break;
+        }
+        case "ivec2": {
+          const v = uniforms[script_uniform.name] as number[]
+          this.context.uniform2i(this.cache.uniforms[script_uniform.name], v[0], v[1]);
+          break;
+        }
+        case "ivec3": {
+          const v = uniforms[script_uniform.name] as number[]
+          this.context.uniform3i(this.cache.uniforms[script_uniform.name], v[0], v[1], v[2]);
+          break;
+        }
+        case "ivec4": {
+          const v = uniforms[script_uniform.name] as number[]
+          this.context.uniform4i(this.cache.uniforms[script_uniform.name], v[0], v[1], v[2], v[3]);
+          break;
+        }
+        case "mat3": {
+          const v = new Float32Array(uniforms[script_uniform.name] as number[])
+          this.context.uniformMatrix3fv(this.cache.uniforms[script_uniform.name], false, v);
+          break;
+        }
+        case "mat4": {
+          const v = new Float32Array(uniforms[script_uniform.name] as number[])
+          this.context.uniformMatrix4fv(this.cache.uniforms[script_uniform.name], false, v);
           break;
         }
         case "Color1D":
@@ -305,9 +337,7 @@ export class Program {
     })
 
     //---------------------------------------------------
-    //
     // PROGRAM: BIND & RENDER GEOMETRIES
-    //
     //---------------------------------------------------
     this.context.bindBuffer(this.context.ARRAY_BUFFER, this.plane.position)
     this.context.enableVertexAttribArray(this.cache.attributes["nc_thread_position"])
@@ -321,9 +351,7 @@ export class Program {
     this.context.drawElements(this.context.TRIANGLES, 6, this.context.UNSIGNED_SHORT, 0)
 
     //---------------------------------------------------
-    //
     // FRAMBUFFER: END
-    //
     //---------------------------------------------------
     outputs.forEach((_, index) => {
       this.context.framebufferTexture2D (
@@ -333,6 +361,7 @@ export class Program {
         null, 
         0);
     })
+    
     this.context.bindFramebuffer (this.context.FRAMEBUFFER, null)
   }
 
@@ -347,9 +376,7 @@ export class Program {
     const errors = []
 
     //---------------------------------------------------
-    //
     // OUTPUT
-    //
     //---------------------------------------------------
     
     // check output length matches that of the shader. 
@@ -368,9 +395,7 @@ export class Program {
     }
 
     //---------------------------------------------------
-    //
     // INPUT
-    //
     //---------------------------------------------------
     
     // (optional) check that all uniforms have been assigned.

@@ -92,7 +92,7 @@ const b = context.createFloat1D(4096).map(x => 2).push()
 const c = 2
 
 const output = context.createFloat1D(4096)
-program.execute([c], {a, b, c})
+program.execute([output], {a, b, c})
 
 output.pull() 
 

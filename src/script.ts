@@ -28,10 +28,16 @@ THE SOFTWARE.
 
 //-----------------------------------------------------------------------//
 //                                                                       //
-// neuron compute script                                                 //
+//  tesseract compute script transform                                   //
 //                                                                       //
-// the following code is a simple script transpiler that converts user   //
-// script into GLSL shader 3 compatible profile.                         //
+//  the following script transforms the tesseract thread function,       //
+//  uniform buffers and indexing hints into a GLSL vertex and fragment   //
+//  shaders.                                                             //
+//                                                                       //
+//  this script is also responsible for extracting meta information      //
+//  about the script that the program uses during its binding process.   //
+//                                                                       //
+//-----------------------------------------------------------------------//
 //                                                                       //
 //  uniform Float2D matrix;  <- [expand]                                 //
 //  uniform Float1D input;   <- [expand]                                 //
@@ -56,7 +62,7 @@ THE SOFTWARE.
 //                                                                       //
 //-----------------------------------------------------------------------//
 
-interface MatchResult { 
+type MatchResult = { 
   literal  : string, 
   captures : string[] 
 }
@@ -199,9 +205,9 @@ export const replace_thread_output_indexer = (code: string) => {
   }, code)  
 }
 export const replace_thread_output_dimensions = (code: string) => {
-  return code.replace("thread.width",  "nc_thread_output_width")
-             .replace("thread.height", "nc_thread_output_height")
-             .replace("thread.depth",  "nc_thread_output_depth")
+  return code.replace(/thread.width/g,  "nc_thread_output_width")
+             .replace(/thread.height/g, "nc_thread_output_height")
+             .replace(/thread.depth/g,  "nc_thread_output_depth")
 }
 export const replace_thread_signature = (code: string) => {
   const results = 

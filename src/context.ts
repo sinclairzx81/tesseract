@@ -31,8 +31,9 @@ import { Color1D, Color2D, Color3D } from "./color"
 import { Float1D, Float2D, Float3D } from "./float"
 import { Program, ProgramUniforms}   from "./program"
 import { Plane  }                    from "./plane"
+import { Present }                   from "./present"
 
-type ProgramArrayType = 
+export type BufferType = 
   | Float1D
   | Float2D
   | Float3D
@@ -41,8 +42,9 @@ type ProgramArrayType =
   | Color3D
 
 export class Context implements Disposable {
-  private framebuf : WebGLFramebuffer
-  private plane    : Plane
+  private framebuf  : WebGLFramebuffer
+  private plane     : Plane
+  private present   : Present
   
   /**
    * creates a new compute context using the given webgl2 rendering context. If no
@@ -59,8 +61,9 @@ export class Context implements Disposable {
         antialias : false 
       })
     }
-    this.framebuf      = this.context.createFramebuffer()
-    this.plane         = new Plane (this.context)
+    this.framebuf = this.context.createFramebuffer()
+    this.plane    = new Plane (this.context)
+    this.present  = new Present(this.context, this.plane)
   }
 
   /**
@@ -74,71 +77,81 @@ export class Context implements Disposable {
   }
 
   /**
-   * creates Data1D buffer.
+   * creates Color1D buffer.
    * @param {number} length the length of this buffer.
-   * @returns {Data1D}
+   * @returns {Color1D}
    */
   public createColor1D(length: number) : Color1D {
     return new Color1D(this.context, this.framebuf, length)
   }
 
   /**
-   * creates Data2D buffer.
+   * creates Color2D buffer.
    * @param {number} width the width of this buffer.
    * @param {number} height the height of this buffer.
-   * @returns {Data2D}
+   * @returns {Color2D}
    */
   public createColor2D(width: number, height: number) : Color2D {
     return new Color2D(this.context, this.framebuf, width, height)
   }
 
   /**
-   * creates Data3D buffer.
+   * creates Color3D buffer.
    * @param {number} width the width of this buffer.
    * @param {number} height the height of this buffer.
    * @param {number} depth the depth of this buffer.
-   * @returns {Data3D}
+   * @returns {Color3D}
    */
   public createColor3D(width: number, height: number, depth: number) : Color3D {
     return new Color3D(this.context, this.framebuf, width, height, depth)
   }
 
   /**
-   * creates Data1D buffer.
+   * creates Float1D buffer.
    * @param {number} length the length of this buffer.
-   * @returns {Data1D}
+   * @returns {Float1D}
    */
   public createFloat1D(length: number) : Float1D {
     return new Float1D(this.context, this.framebuf, length)
   }
 
   /**
-   * creates Data2D buffer.
+   * creates Float2D buffer.
    * @param {number} width the width of this buffer.
    * @param {number} height the height of this buffer.
-   * @returns {Data2D}
+   * @returns {Float2D}
    */
   public createFloat2D(width: number, height: number) : Float2D {
     return new Float2D(this.context, this.framebuf, width, height)
   }
 
   /**
-   * creates Data3D buffer.
+   * creates Float3D buffer.
    * @param {number} width the width of this buffer.
    * @param {number} height the height of this buffer.
    * @param {number} depth the depth of this buffer.
-   * @returns {Data3D}
+   * @returns {Float3D}
    */
   public createFloat3D(width: number, height: number, depth: number) : Float3D {
     return new Float3D(this.context, this.framebuf, width, height, depth)
   }
   
   /**
+   * presents the given buffer to the pixel buffer. used for debugging.
+   * @param {BufferType} buffer the buffer to present.
+   * @returns {void}
+   */
+  public render(buffer: BufferType) : void {
+    this.present.present(buffer)
+  }
+
+  /**
    * disposes this compute context.
    * @returns {void}
    */
   public dispose() : void {
     this.context.deleteFramebuffer(this.framebuf)
+    this.present.dispose()
     this.plane.dispose()
   }
 }
