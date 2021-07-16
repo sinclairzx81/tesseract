@@ -1,6 +1,6 @@
-### tesseract
+# Tesseract
 
-A webgl 2.0 gpgpu compute library for JavaScript.
+A WebGL 2.0 GPGPU Compute Library for JavaScript.
 
 ```typescript
 const context = tesseract.createContext()
