@@ -20,7 +20,7 @@ console.log(output.pull().data)
 // -> [0, 1, 2, 3, ...]
 ```
 
-### overview
+### Overview
 
 tesseract is a gpgpu compute library built against the webgl 2.0 graphics api. The library hides away the details of webgl, offering instead a simplified programming model that provides simple integer offset addressing into graphics buffers on the GPU. The library was written primarily to help assist with accellerating large vector / matrix multiplication and to assist with image map / reduce for convolution neural networks.
 
@@ -33,7 +33,7 @@ tesseract supports:
 
 tesseract is a work in progress, and offered as is for anyone who finds it useful or interesting.
 
-### building the project
+### Building the Project
 
 tesseract is written with typescript. You can build the standalone with the following.
 
@@ -47,7 +47,7 @@ the test project can be built with.
 npm run build-test
 ```
 
-### the thread function
+### The Thread Function
 
 tesseract programs are parsed GLSL 300 es fragment shaders. Each program defines a ```thread()``` function that is used to define the input indexing and output of the program. An example of a thread function is as follows.
 
@@ -72,7 +72,7 @@ tesseract interprets this program in the following way..
 - the program outputs to 2 buffer targets as defined by the ```[float, color]``` return type.
 - the first output must be a ```Float2D``` buffer type, the second output must be a ```Color2D``` buffer type.
 
-### thread uniforms
+### Thread Uniforms
 
 Like regular shaders, tesseract supports passing uniforms. tesseract provides a convienent indexer syntax which looks up the pixel integer offset of the given uniform. The following adds two buffers.
 
@@ -99,13 +99,13 @@ output.pull()
 console.log(output.data) // [5, 5, 5, 5, 5, ...]
 ```
 
-### buffer encoding scheme
+### Buffer Encoding Scheme
 
 tesseract encodes all buffers in TEXTURE_2D buffers (even 3D buffers) for generality, and currently supports 1D, 2D and 3D buffer float and color variants. Future updates to this project may allow for arbituary dimensionality of arrays.
 
 buffers are encoded using a row major 2D encoding scheme. 
 
-### floating point precision
+### Floating Point Precision
 
 tesseract currently encodes / decodes 32 bit numbers inside RGBA unsigned byte values (the only supported texture read interface for webgl). Because of this encoding, there is a loss of precision during this encode / decode phase.
 
